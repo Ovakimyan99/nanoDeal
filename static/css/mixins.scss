@@ -1,0 +1,21 @@
+@mixin stateFontsLitle ($color: var(----menu-words), $fw: 600) {
+  font-size: 13px;
+  line-height: 15px;
+  font-weight: $fw;
+  color: $color;
+}
+
+@mixin stateFontsMedium ($color: var(----menu-words), $fw: 600) {
+  font-size: 14px;
+  line-height: 16px;
+  font-weight: $fw;
+  color: $color;
+}
+
+@mixin stateFontsBig ($color: var(----menu-words), $fw: 600) {
+  font-size: 16px;
+  line-height: 19px;
+  font-weight: $fw;
+  color: $color;
+
+}
