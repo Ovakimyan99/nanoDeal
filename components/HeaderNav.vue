@@ -198,6 +198,9 @@ export default {
       &.nuxt-link-active {
         background: var(--orange);
         color: var(--white);
+         img {
+           filter: brightness(1000%);
+         }
       }
     }
 
