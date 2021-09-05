@@ -2,7 +2,7 @@
   <header class="header">
     <!-- logo -->
     <div class="header-logo-wrapper">
-      <img class="header-logo__btn" src="@/static/img/icons/general/menu.svg" alt="burger" title="тык">
+      <img @click="burger($event)" class="header-logo__btn" src="@/static/img/icons/general/menu.svg" alt="burger" title="тык">
       <img class="header-logo__img" src="@/static/img/icons/general/logo.svg" alt="nanodeal" title="компания nanodeal">
       <user-img-app :img-data="this.userData ? this.userData : null" class="header-logo__user" />
     </div>
@@ -97,6 +97,10 @@ export default {
       } else {
         return linkPage.filter(page => page.page === [...this.$route.fullPath].slice(1).join(''))[0].text
       }
+    },
+    burger (e) {
+      const headerList = e.target.closest('.header').querySelector('.header-list')
+      headerList.classList.toggle('active')
     }
   },
   mounted () {
@@ -109,20 +113,20 @@ export default {
 @import "static/css/mixins";
 
 .header {
-  width: 200px;
+  min-width: 200px;
   padding: 10px 20px;
+  flex: 1;
 
   &-logo-wrapper {
     display: flex;
     width: 100%;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    margin: 0 auto 50px;
+    margin: 10px auto 15px;
 
-    @media (min-width: 1440px) {
-      &-logo-wrapper {
-        justify-content: space-between;
-      }
+    @media (min-width: 1148px) {
+      justify-content: center;
+      margin: 20px auto 50px;
     }
   }
 
@@ -133,7 +137,11 @@ export default {
     }
 
     &__img {
-      max-width: 150px;
+      max-width: 130px;
+
+      @media (min-width:410px) {
+        max-width: 150px;
+      }
     }
 
     &__user {
@@ -151,7 +159,7 @@ export default {
       }
     }
 
-    @media (min-width: 1440px) {
+    @media (min-width: 1148px) {
       &__btn, &__user {
         display: none;
       }
@@ -159,6 +167,18 @@ export default {
   }
 
   &-list {
+    display: none;
+
+    &.active {
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    &.active &__link {
+      width: 138px;
+      margin: 0 auto;
+    }
+
     &__link {
       position: relative;
       padding: 17px 0 17px 63px;
@@ -186,6 +206,16 @@ export default {
       left: 23px;
       top: 15px;
     }
+
+    @media (min-width:1148px) {
+      display: block;
+    }
+  }
+
+  @media (min-width: 1148px) {
+    justify-content: space-between;
+    margin: 20px auto 50px;
+    max-width: 200px;
   }
 }
 </style>

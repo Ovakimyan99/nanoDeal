@@ -1,25 +1,29 @@
 <template>
   <div>
-    <div class="tabs" ref="tabs">
-      <div class="tabs-btn" v-for="tab of this.tabs" :key="tab.text" @click="activeTab($event)">
+    <div ref="tabs" class="tabs">
+      <div v-for="tab of tabs" :key="tab.text" class="tabs-btn" @click="activeTab($event)">
         <img :src="`/img/icons/condition/suggestions/${tab.imgUrl}.svg`" :alt="tab.text" class="tabs-btn__img">
         <span class="tabs-btn__span">{{ tab.text }}</span>
       </div>
     </div>
+    <search-app class="search-app" />
     <div class="products-wrapper">
       <product-card-app
-        v-for="n of 3"
-        :key="n"
+        v-for="user of this.active"
+        :key="user.title"
+        :userData="user"
       />
     </div>
   </div>
 </template>
 
 <script>
+import { mapState, mapGetters } from 'vuex'
 import ProductCardApp from '../components/ProductCard'
+import SearchApp from '../components/Search'
 
 export default {
-  name: 'addNew',
+  name: 'AddNew',
   data: () => {
     return {
       tabs: [
@@ -54,8 +58,13 @@ export default {
       }
     }
   },
+  computed: {
+    ...mapState('user', ['users']),
+    ...mapGetters('user', ['active'])
+  },
   components: {
-    ProductCardApp
+    ProductCardApp,
+    SearchApp
   }
 }
 </script>
@@ -66,16 +75,21 @@ export default {
 .tabs {
   display: flex;
   justify-content: flex-start;
-  padding: 25px 0 50px;
+  padding: 10px 0 30px;
   position: relative;
+  overflow: auto;
 
   &:after {
     content: '';
     position: absolute;
-    bottom: 25px;
+    bottom: 15px;
     height: 1px;
     width: 100%;
     background: #D9C4B7;
+
+    @media (min-width: 1148px) {
+      bottom: 25px;
+    }
   }
 
   &-btn {
@@ -85,6 +99,7 @@ export default {
     padding: 10px 17px;
     border-radius: 10px;
     cursor: pointer;
+    min-width: fit-content;
 
     &__img {
       margin-right: 8px;
@@ -98,13 +113,44 @@ export default {
       margin-right: 14px;
     }
   }
+
+  @media (min-width: 694px) {
+    overflow: visible;
+  }
+
+  @media (min-width: 1148px) {
+    padding: 25px 0 50px;
+  }
 }
 
 .products-wrapper {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: 1fr;
-  gap: 10px 20px;
-  grid-template-areas: ". . .";
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  @media (min-width: 830px) {
+    justify-content: space-between;
+  }
+
+  @media (min-width: 1428px) {
+    display: grid;
+    grid-template-rows: 1fr;
+    grid-template-areas: ". . .";
+    gap: 23px 43px;
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+.search-app {
+  margin-bottom: 20px;
+  width: 100%;
+
+  @media (min-width: 830px) {
+    width: 350px;
+  }
+
+  @media (min-width: 1148px) {
+    display: none;
+  }
 }
 </style>

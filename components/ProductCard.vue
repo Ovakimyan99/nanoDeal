@@ -1,35 +1,40 @@
 <template>
   <div class="card">
-
     <!-- header -->
     <div class="card-header">
       <div class="card__company">
-        <img src="@/static/img/icons/companies/nike.png" alt="nike" class="card__company-img">
-        <span class="card__company-title">Nike</span>
+        <img :src="user.brand.logoLink" :alt="user.brand.name" class="card__company-img">
+        <span class="card__company-title">{{ user.brand.name }}</span>
       </div>
-      <span class="card-state">Активное</span>
+      <span class="card-state">{{ user.status }}</span>
     </div>
 
     <!-- card image -->
-    <picture class="card-image-wrapper">
-      <source class="card-image-wrapper__img" srcset="@/static/img/products/sneaker-1.jpg" type="image/webp">
-      <img class="card-image-wrapper__img" src="@/static/img/products/sneaker-1.jpg">
-      <img class="card-image-wrapper__fon" src="@/static/img/products/sneaker-1.jpg">
+    <picture v-if="user.productImg.length" class="card-image-wrapper">
+      <source
+        class="card-image-wrapper__img"
+        :srcset="extension ? extension : user.productImg[0]"
+        type="image/webp"
+      >
+      <img class="card-image-wrapper__img" :src="user.productImg[0]">
+      <img class="card-image-wrapper__fon" :src="user.productImg[0]">
     </picture>
 
     <!-- card filling: sms, bid, .. -->
     <div class="card-filling">
       <!-- card titile -->
-      <h2 class="card-filling__title">Записать сторис в кросcовках Nike Air Max 720</h2>
+      <h2 class="card-filling__title">
+        {{ user.title }}
+      </h2>
       <!-- card description - GIFT / OFFER -->
       <p class="card-offer">
-        Репост строис в официальном аккаунте NikeRussia
+        {{ user.gift }}
       </p>
       <!-- card sms -->
       <div class="card-info card-info--action">
         <span class="card-info__content">Новые сообщения</span>
         <div class="card-info__sms-wrapper">
-          <span class="card-info__sms card-info--sms">10</span>
+          <span class="card-info__sms card-info--sms">{{ user.newSms.length }}</span>
         </div>
       </div>
       <!-- card bid -->
@@ -38,39 +43,77 @@
         <div class="card-info__sms-wrapper">
           <!-- users img -->
           <user-img-app
-            v-for="n of 3"
-            :key="n"
+            v-for="n of this.user.newBid.slice(0,3)"
+            :key="n*5 + n.name"
+            :img-data="n"
             class="card-info__sms--bid card-info__img--bid"
           />
+          <!-- :imgData="this.user.newBid[n]" -->
           <!-- users img amount -->
-          <span class="card-info__sms card-info__sms--bid">+3</span>
+          <span class="card-info__sms card-info__sms--bid">{{ +user.newBid.length - 3 > 0 ? '+' + (user.newBid.length - 3) : 0 }}</span>
         </div>
       </div>
       <!-- card timer -->
       <div class="card-info">
         <span class="card-info__content">До завершения</span>
-        <time class="card-timer" datetime="2001-05-15 19:00">
-          <div class="card-timer__block"><span id="days">1 д</span> :&#160;</div>
-          <div class="card-timer__block"><span id="hours">3 ч</span> :&#160;</div>
-          <div class="card-timer__block"><span id="minutes">30 м</span> :&#160;</div>
-          <div class="card-timer__block"><span id="seconds">10 с</span></div>
+        <time class="card-timer" :datetime="this.user.dropDate" v-if="this.realDate && this.realDate > 0">
+          <div class="card-timer__block"><span id="week">
+            {{ Math.floor((Math.floor((this.timeLeft / (1000 * 60 * 60 * 24 * 7))))) }}н
+          </span> :&#160;</div>
+          <div class="card-timer__block"><span id="days">
+            {{ Math.floor((this.timeLeft / (1000 * 60 * 60 * 24))) }}д
+          </span> :&#160;</div>
+          <div class="card-timer__block"><span id="hours">
+            {{ Math.floor((this.timeLeft / (1000 * 60 * 60) % 24)) }}ч
+          </span> :&#160;</div>
+          <div class="card-timer__block"><span id="minutes">
+            {{ Math.floor((this.timeLeft / 1000 / 60) % 60) }}м
+          </span> :&#160;</div>
+          <div class="card-timer__block"><span id="seconds">
+            {{ Math.floor((this.timeLeft / 1000) % 60) }}с
+          </span></div>
+        </time>
+        <time class="card-timer" :datetime="this.user.dropDate" v-else>
+          <div class="card-timer__block">released</div>
         </time>
       </div>
       <!-- ignorance - я правда не понял о чем этот блок -->
       <div class="card-info">
         <span class="card-info__content">Выполнено</span>
-        <span class="card-info__completed">250 / 3000</span>
+        <span class="card-info__completed">{{ user.numDone }} / 3000</span>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { mapActions, mapState } from 'vuex'
 import UserImgApp from './UserImg'
+
 export default {
   name: 'ProductCard',
   components: {
     UserImgApp
+  },
+  props: ['userData'],
+  data: () => ({
+    realDate: null
+  }),
+  computed: {
+    ...mapState('user', ['timeLeft']),
+    user () {
+      return this.userData
+    },
+    extension () {
+      return this.user.productImg.filter(url => url.split('.')[1] === 'webp')
+    }
+  },
+  methods: {
+    ...mapActions('user', ['timer'])
+  },
+  async mounted () {
+    await this.timer(this.user.dropDate)
+    this.realDate = Date.parse(this.user.dropDate) - Date.parse(new Date())
   }
 }
 </script>
@@ -83,8 +126,30 @@ export default {
   background: var(--white);
   box-shadow: 0 10px 20px rgba(233, 216, 207, 0.3);
   border-radius: 4px 20px 20px 24px;
+  min-width: 250px;
   max-width: 322px;
-  padding: 14px;
+  margin-bottom: 20px;
+  padding: 5px 7px;
+
+  &:not(:nth-child(2n)) {
+    @media (min-width:810px) {
+      margin-right: 15px;
+    }
+  }
+
+  @media (min-width:410px) {
+    padding: 14px;
+  }
+
+  @media (min-width:810px) {
+    max-width: 322px;
+    min-width: 300px;
+  }
+
+  @media (min-width: 1428px) {
+    margin-right: 0;
+    margin-bottom: 0;
+  }
 }
 
 // header
@@ -146,7 +211,7 @@ export default {
       width: 78%;
       height: 87%;
       opacity: 0.7;
-      filter: blur(30px);
+      filter: blur(10px);
       bottom: -5px;
       left: 50%;
       transform: translatex(-50%);
@@ -176,6 +241,8 @@ export default {
     font-feature-settings: 'pnum' on, 'lnum' on;
     color: #FC5A8B;
     padding-left: 28px;
+    margin: 10px 0 14px;
+    min-height: 32px;
 
     &:after {
       content: '';
@@ -203,6 +270,7 @@ export default {
       cursor: pointer;
       display: flex;
       position: relative;
+      min-width: 30px;
 
       list-style: none;
       text-decoration: none;
@@ -226,6 +294,8 @@ export default {
       padding: 7px;
       border-radius: 50%;
       line-height: 1;
+      width: 16px;
+      text-align: center;
 
       &--bid {
         background: var(--white-shade);
@@ -270,7 +340,6 @@ export default {
 
     &__completed {
       background: var(--green);
-      color: var(--white);
       padding: 7px 12px;
       border-radius: 8px;
       @include stateFontsMedium(var(--white));
@@ -285,9 +354,12 @@ export default {
     padding: 8px 15px;
     background: var(--orange-shade);
     border-radius: 8px;
+    min-width: 140px;
+    text-align: center;
 
     &__block {
       @include stateFontsLitle(var(--orange), 700);
+      margin: 0 auto;
     }
   }
 }
