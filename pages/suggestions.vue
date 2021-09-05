@@ -142,11 +142,12 @@ export default {
 }
 
 .search-app {
-  margin-bottom: 20px;
+  max-width: 350px;
   width: 100%;
+  margin: 0 auto 20px;
 
   @media (min-width: 830px) {
-    width: 350px;
+    margin: 0 0 20px 0;
   }
 
   @media (min-width: 1148px) {

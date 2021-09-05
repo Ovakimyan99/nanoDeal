@@ -87,7 +87,6 @@ export default {
   mutations: {
     DROP_DATE_CHANGE (state, payload) {
       state.dropDate = payload
-      console.log(state.dropDate)
     },
     ITEM_LEFT_CHANGE (state, payload) {
       state.timeLeft = payload

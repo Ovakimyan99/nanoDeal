@@ -9,6 +9,7 @@ export default {
     return {}
   },
   mounted () {
+    window.onNuxtReady(() => { window.$nuxt.$router.push('/suggestions') })
   }
 }
 </script>

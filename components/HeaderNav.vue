@@ -94,7 +94,7 @@ export default {
     definePage (linkPage) {
       if (!linkPage.length) {
         return this.links.filter(page => page.page === linkPage.page)[0].text
-      } else {
+      } else if ([...this.$route.fullPath].splice(1, 1).length) {
         return linkPage.filter(page => page.page === [...this.$route.fullPath].slice(1).join(''))[0].text
       }
     },
